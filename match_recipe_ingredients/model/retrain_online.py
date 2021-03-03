@@ -68,7 +68,7 @@ params = {
 
 # build and compile model based on original experiment params:
 model, loss = build_model(
-    vocab_size = word_encoder.vocab_size,
+    word_encoder = word_encoder,
     word_embedding_size = params["WORD_EMBEDDING_SIZE"],
     sentence_embedding_size = params["SENTENCE_EMBEDDING_SIZE"],
     embedding_architecture = params["EMBEDDING_ARCHITECTURE"],

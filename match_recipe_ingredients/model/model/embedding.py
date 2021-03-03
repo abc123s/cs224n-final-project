@@ -1,6 +1,10 @@
 import tensorflow as tf
 from tensorflow import keras
 
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../..'))
+from embedding_layer.build_embedding_layer import build_embedding_layer
+
 def construct_regularizer(regularizer, regularization_factor):
     # construct regularizer
     if regularizer == 'l2':
@@ -16,7 +20,7 @@ def construct_regularizer(regularizer, regularization_factor):
 
 
 def build_embedding(
-    vocab_size,
+    word_encoder,
     word_embedding_size,
     sentence_embedding_size,
     architecture,
@@ -29,7 +33,8 @@ def build_embedding(
     use_tags,
     embed_tags,
     tag_size,
-    tag_embedding_size
+    tag_embedding_size,
+    pretrained_embeddings = None
 ):
     kernel_regularizer_instance = construct_regularizer(
         kernel_regularizer,
@@ -45,7 +50,12 @@ def build_embedding(
         tokens = keras.Input(shape=(50,), name = 'tokens')
         tags = keras.Input(shape=(50,), name = 'tags')
 
-        token_embedding_layer = keras.layers.Embedding(vocab_size, word_embedding_size, mask_zero = True, name = "token_embedding")
+        token_embedding_layer = build_embedding_layer(
+            embedding_units = word_embedding_size,
+            word_encoder = word_encoder,
+            pretrained_embeddings = pretrained_embeddings,
+            name = "token_embedding"
+        )
         embedded_tokens = token_embedding_layer(tokens)
 
         if embed_tags:
@@ -88,7 +98,11 @@ def build_embedding(
         if architecture == 'simple':
             return keras.Sequential(
                 [
-                    keras.layers.Embedding(vocab_size, word_embedding_size, mask_zero = True),
+                    build_embedding_layer(
+                        embedding_units = word_embedding_size,
+                        word_encoder = word_encoder,
+                        pretrained_embeddings = pretrained_embeddings
+                    ),
                     keras.layers.LSTM(
                         sentence_embedding_size,
                         kernel_regularizer = kernel_regularizer_instance,
@@ -102,7 +116,11 @@ def build_embedding(
         if architecture == 'bidirectional':
             return keras.Sequential(
                 [
-                    keras.layers.Embedding(vocab_size, word_embedding_size, mask_zero = True),
+                    build_embedding_layer(
+                        embedding_units = word_embedding_size,
+                        word_encoder = word_encoder,
+                        pretrained_embeddings = pretrained_embeddings
+                    ),
                     keras.layers.Bidirectional(
                         keras.layers.LSTM(
                             sentence_embedding_size,

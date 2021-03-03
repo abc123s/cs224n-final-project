@@ -40,6 +40,7 @@ os.mkdir(experiment_dir)
 params = {}
 # model structure
 params["WORD_EMBEDDING_SIZE"] = 64
+params["PRETRAINED_EMBEDDINGS"] = None
 params["SENTENCE_EMBEDDING_SIZE"] = 64
 params["EMBEDDING_ARCHITECTURE"] = 'simple'
 
@@ -85,7 +86,7 @@ elif params["TRAINING_METHOD"] == "triplet_mining_batch_by_ingredient":
 
 # build and compile model based on specified hyperparams:
 model, loss = build_model(
-    vocab_size = word_encoder.vocab_size,
+    word_encoder = word_encoder,
     word_embedding_size = params["WORD_EMBEDDING_SIZE"],
     sentence_embedding_size = params["SENTENCE_EMBEDDING_SIZE"],
     embedding_architecture = params["EMBEDDING_ARCHITECTURE"],
@@ -96,6 +97,11 @@ model, loss = build_model(
     recurrent_regularization_factor = params["RECURRENT_REGULARIZATION_FACTOR"],
     dropout_rate = params["DROPOUT_RATE"],
     recurrent_dropout_rate = params["RECURRENT_DROPOUT_RATE"],
+    use_tags = False,
+    embed_tags = False,
+    tag_size = None,
+    tag_embedding_size = None,
+    pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"],
 )
 
 model.compile(loss=loss, optimizer=params["OPTIMIZER"])

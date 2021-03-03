@@ -57,7 +57,7 @@ def construct_embedding_matrix(embedding_units, word_encoder, word_to_embedding)
     return embedding_matrix
 
 # helper function to construct embedding layer of model
-def build_embedding_layer(embedding_units, word_encoder, pretrained_embeddings = None):
+def build_embedding_layer(embedding_units, word_encoder, pretrained_embeddings = None, name = "embedding"):
     # construct non-pretrained embedding layer
     if pretrained_embeddings == None:
         return keras.layers.Embedding(word_encoder.vocab_size, embedding_units, mask_zero = True)
@@ -75,5 +75,6 @@ def build_embedding_layer(embedding_units, word_encoder, pretrained_embeddings =
             word_encoder.vocab_size,
             embedding_units,
             embeddings_initializer=keras.initializers.Constant(embedding_matrix),
-            mask_zero = True
+            mask_zero = True,
+            name = name
         )

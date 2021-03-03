@@ -203,7 +203,7 @@ with open(experiment_dir + "/params.json", "r") as f:
 
 # build and compile model based on experiment params:
 model, _ = build_model(
-    vocab_size = word_encoder.vocab_size,
+    word_encoder = word_encoder,
     word_embedding_size = params["WORD_EMBEDDING_SIZE"],
     sentence_embedding_size = params["SENTENCE_EMBEDDING_SIZE"],
     embedding_architecture = params["EMBEDDING_ARCHITECTURE"],

@@ -13,6 +13,7 @@ from evaluate import evaluate
 # hyperparameters
 # model structure
 WORD_EMBEDDING_SIZE = 64
+PRETRAINED_EMBEDDINGS = None
 SENTENCE_EMBEDDING_SIZE = 64
 EMBEDDING_ARCHITECTURE = 'simple'
 USE_TAGS = True
@@ -44,7 +45,7 @@ with open(os.path.join(os.path.dirname(__file__), "data/trainMatchedTrainingExam
 
 if USE_TAGS:
     if TRAINING_EXAMPLE_TYPE == "offline_tagged_complete":
-        dataset, vocab_size, tag_size = preprocess_train_raw(
+        dataset, word_encoder, tag_size = preprocess_train_raw(
             raw_examples = raw_training_examples,
             triplet_options = {
                 "include_no_match": False,
@@ -55,7 +56,7 @@ if USE_TAGS:
             shuffle_before_batch = SHUFFLE_BEFORE_BATCH
         )
     elif TRAINING_EXAMPLE_TYPE == "offline_tagged_complete_with_no_match":
-        dataset, vocab_size, tag_size = preprocess_train_raw(
+        dataset, word_encoder, tag_size = preprocess_train_raw(
             raw_examples = raw_training_examples,
             triplet_options = {
                 "include_no_match": True,
@@ -82,7 +83,7 @@ else:
     with open(os.path.join(os.path.dirname(__file__), training_example_directories[TRAINING_EXAMPLE_TYPE])) as training_examples_data:
         training_examples = json.load(training_examples_data)    
 
-    dataset, vocab_size = preprocess_train(
+    dataset, word_encoder = preprocess_train(
         training_examples,
         shuffle_buffer_size = SHUFFLE_BUFFER_SIZE,
         batch_size = BATCH_SIZE,
@@ -92,7 +93,7 @@ else:
 
 # build model
 model, loss = build_model(
-    vocab_size = vocab_size,
+    word_encoder = word_encoder,
     word_embedding_size = WORD_EMBEDDING_SIZE,
     sentence_embedding_size = SENTENCE_EMBEDDING_SIZE,
     embedding_architecture = EMBEDDING_ARCHITECTURE,
@@ -106,7 +107,8 @@ model, loss = build_model(
     use_tags = USE_TAGS,
     embed_tags = EMBED_TAGS,
     tag_size = tag_size,
-    tag_embedding_size = TAG_EMBEDDING_SIZE
+    tag_embedding_size = TAG_EMBEDDING_SIZE,
+    pretrained_embeddings = PRETRAINED_EMBEDDINGS
 )
 
 model.summary()
@@ -133,6 +135,7 @@ with open(experiment_dir + "/params.json", "w") as f:
     json.dump(
         {
             "WORD_EMBEDDING_SIZE": WORD_EMBEDDING_SIZE,
+            "PRETRAINED_EMBEDDINGS": PRETRAINED_EMBEDDINGS,
             "SENTENCE_EMBEDDING_SIZE": SENTENCE_EMBEDDING_SIZE,
             "EMBEDDING_ARCHITECTURE": EMBEDDING_ARCHITECTURE,
             "USE_TAGS": USE_TAGS,
