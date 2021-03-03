@@ -41,7 +41,7 @@ params = {
 
 if params["USE_TAGS"]:
     if params["RETRAINING_EXAMPLE_TYPE"] == "offline_tagged_complete":
-        dataset, vocab_size, tag_size = preprocess_train_raw(
+        dataset, word_encoder, tag_size = preprocess_train_raw(
             raw_examples = raw_training_examples,
             triplet_options = {
                 "include_no_match": False,
@@ -52,7 +52,7 @@ if params["USE_TAGS"]:
             shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"]
         )
     elif params["RETRAINING_EXAMPLE_TYPE"] == "offline_tagged_complete_with_no_match":
-        dataset, vocab_size, tag_size = preprocess_train_raw(
+        dataset, word_encoder, tag_size = preprocess_train_raw(
             raw_examples = raw_training_examples,
             triplet_options = {
                 "include_no_match": True,
@@ -79,7 +79,7 @@ else:
     with open(os.path.join(os.path.dirname(__file__), training_example_directories[params["RETRAINING_EXAMPLE_TYPE"]])) as training_examples_data:
         training_examples = json.load(training_examples_data)
 
-    dataset, vocab_size = preprocess_train(
+    dataset, word_encoder = preprocess_train(
         training_examples,
         shuffle_buffer_size = params["SHUFFLE_BUFFER_SIZE"],
         batch_size = params["BATCH_SIZE"],
@@ -89,7 +89,7 @@ else:
 
 # build and compile model based on original experiment params:
 model, loss = build_model(
-    vocab_size = vocab_size,
+    word_encoder = word_encoder,
     word_embedding_size = params["WORD_EMBEDDING_SIZE"],
     sentence_embedding_size = params["SENTENCE_EMBEDDING_SIZE"],
     embedding_architecture = params["EMBEDDING_ARCHITECTURE"],

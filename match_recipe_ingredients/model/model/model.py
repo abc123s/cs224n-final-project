@@ -4,7 +4,7 @@ from tensorflow import keras
 from model.embedding import build_embedding 
 
 def build_model(
-    vocab_size,
+    word_encoder,
     word_embedding_size,
     sentence_embedding_size,
     embedding_architecture,
@@ -18,11 +18,12 @@ def build_model(
     use_tags,
     embed_tags,
     tag_size,
-    tag_embedding_size
+    tag_embedding_size,
+    pretrained_embeddings = None
 ):
     # construct model
     embedding = build_embedding(
-        vocab_size = vocab_size,
+        word_encoder = word_encoder,
         word_embedding_size = word_embedding_size,
         sentence_embedding_size = sentence_embedding_size,
         architecture = embedding_architecture,
@@ -35,7 +36,8 @@ def build_model(
         use_tags = use_tags,
         embed_tags = embed_tags,
         tag_size = tag_size,
-        tag_embedding_size = tag_embedding_size
+        tag_embedding_size = tag_embedding_size,
+        pretrained_embeddings = pretrained_embeddings
     )
 
     if use_tags:

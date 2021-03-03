@@ -64,9 +64,9 @@ def preprocess_train(all_examples, shuffle_buffer_size, batch_size, shuffle_befo
                                                   output_types=((tf.int32, tf.int32, tf.int32), tf.int32))
 
     if shuffle_before_batch:
-        return test_dataset.shuffle(shuffle_buffer_size, reshuffle_each_iteration=True).batch(batch_size), word_encoder.vocab_size
+        return test_dataset.shuffle(shuffle_buffer_size, reshuffle_each_iteration=True).batch(batch_size), word_encoder
     else:
-        return test_dataset.batch(batch_size).shuffle(shuffle_buffer_size, reshuffle_each_iteration=True), word_encoder.vocab_size
+        return test_dataset.batch(batch_size).shuffle(shuffle_buffer_size, reshuffle_each_iteration=True), word_encoder
 
 def encode_tags(tags, encoded_text):
     if tags == None:
@@ -143,9 +143,9 @@ def preprocess_train_raw(raw_examples, triplet_options, shuffle_buffer_size, bat
                                                     output_types=((tf.int32, tf.int32, tf.int32, tf.int32, tf.int32, tf.int32), tf.int32))
 
         if shuffle_before_batch:
-            return test_dataset.shuffle(shuffle_buffer_size, reshuffle_each_iteration=True).batch(batch_size), word_encoder.vocab_size, tag_encoder.vocab_size
+            return test_dataset.shuffle(shuffle_buffer_size, reshuffle_each_iteration=True).batch(batch_size), word_encoder, tag_encoder.vocab_size
         else:
-            return test_dataset.batch(batch_size).shuffle(shuffle_buffer_size, reshuffle_each_iteration=True), word_encoder.vocab_size, tag_encoder.vocab_size
+            return test_dataset.batch(batch_size).shuffle(shuffle_buffer_size, reshuffle_each_iteration=True), word_encoder, tag_encoder.vocab_size
     else:
         def example_generator():
             for anchor, positive, negative in examples:
@@ -162,9 +162,9 @@ def preprocess_train_raw(raw_examples, triplet_options, shuffle_buffer_size, bat
                                                     output_types=((tf.int32, tf.int32, tf.int32), tf.int32))
 
         if shuffle_before_batch:
-            return test_dataset.shuffle(shuffle_buffer_size, reshuffle_each_iteration=True).batch(batch_size), word_encoder.vocab_size, None
+            return test_dataset.shuffle(shuffle_buffer_size, reshuffle_each_iteration=True).batch(batch_size), word_encoder, None
         else:
-            return test_dataset.batch(batch_size).shuffle(shuffle_buffer_size, reshuffle_each_iteration=True), word_encoder.vocab_size, None
+            return test_dataset.batch(batch_size).shuffle(shuffle_buffer_size, reshuffle_each_iteration=True), word_encoder, None
 
 
 
