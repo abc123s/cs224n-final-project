@@ -58,13 +58,14 @@ dev_batches = dev_data.padded_batch(128, padded_shapes=([None], [None]))
 
 # build model:
 ARCHITECTURE = "blstm"
-EMBEDDING_UNITS = 128
+EMBEDDING_UNITS = 100
 RECURRENT_UNITS = 512
 NUM_RECURRENT_LAYERS = 2
 REGULARIZER = None
 REGULARIZATION_FACTOR = 0
 DROPOUT_RATE = 0
 RECURRENT_DROPOUT_RATE = 0
+PRETRAINED_EMBEDDINGS = None
 
 model = build_model(
     architecture=ARCHITECTURE,
@@ -75,8 +76,9 @@ model = build_model(
     regularization_factor=REGULARIZATION_FACTOR,
     dropout_rate=DROPOUT_RATE,
     recurrent_dropout_rate=RECURRENT_DROPOUT_RATE,
-    vocab_size=word_encoder.vocab_size,
+    word_encoder=word_encoder,
     tag_size=tag_encoder.vocab_size,
+    pretrained_embeddings=PRETRAINED_EMBEDDINGS
 )
 
 # compile model:
@@ -122,6 +124,7 @@ with open(experiment_dir + "/params.json", "w") as f:
             "EPOCHS": EPOCHS,
             "TRAIN_SIZE": TRAIN_SIZE,
             "SHUFFLE_BUFFER_SIZE": SHUFFLE_BUFFER_SIZE,
+            "PRETRAINED_EMBEDDINGS": PRETRAINED_EMBEDDINGS
         },
         f,
         indent=4)
