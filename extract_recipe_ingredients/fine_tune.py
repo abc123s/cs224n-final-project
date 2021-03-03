@@ -94,7 +94,7 @@ model = build_model(
     regularization_factor=params.get("REGULARIZATION_FACTOR", 0),
     dropout_rate=params.get("DROPOUT_RATE", 0),
     recurrent_dropout_rate=params["RECURRENT_DROPOUT_RATE"],
-    vocab_size=word_encoder.vocab_size,
+    word_encoder=word_encoder,
     tag_size=tag_encoder.vocab_size,
 )
 
