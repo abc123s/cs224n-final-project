@@ -1,0 +1,14 @@
+{
+    "WORD_EMBEDDING_SIZE": 64,
+    "SENTENCE_EMBEDDING_SIZE": 64,
+    "EMBEDDING_ARCHITECTURE": "simple",
+    "TRIPLET_MARGIN": 0.2,
+    "OPTIMIZER": "adam",
+    "TRAINING_EXAMPLE_TYPE": "offline_full_v2",
+    "EPOCHS": 10,
+    "ORIGINAL_EXPERIMENT_DIR": "experiments/20201119_0206_6499a5f",
+    "RETRAINING_METHOD": "online_hard_triplet_mining_batch_by_ingredient",
+    "RETRAINING_EPOCHS": 20,
+    "INGREDIENT_IDS_PER_BATCH": 60,
+    "RETRAINING_STEPS_PER_EPOCH": 11
+}

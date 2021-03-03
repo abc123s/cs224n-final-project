@@ -1,0 +1,18 @@
+{
+    "WORD_EMBEDDING_SIZE": 64,
+    "SENTENCE_EMBEDDING_SIZE": 64,
+    "EMBEDDING_ARCHITECTURE": "simple",
+    "TRIPLET_MARGIN": 0.2,
+    "OPTIMIZER": "adam",
+    "TRAINING_EXAMPLE_TYPE": "offline_full_complete",
+    "SHUFFLE_BUFFER_SIZE": 200000,
+    "BATCH_SIZE": 100,
+    "SHUFFLE_BEFORE_BATCH": true,
+    "EPOCHS": 5,
+    "ORIGINAL_EXPERIMENT_DIR": "experiments/20201124_0750_f4b5b37",
+    "RETRAINING_METHOD": "online_hard_triplet_mining_batch_by_example",
+    "RETRAINING_EPOCHS": 20,
+    "INGREDIENT_IDS_PER_BATCH": null,
+    "TRIPLETS_PER_EXAMPLE": 20,
+    "RETRAINING_STEPS_PER_EPOCH": 80.0
+}

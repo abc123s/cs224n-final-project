@@ -1,0 +1,4 @@
+*.pyc
+fullIngredientPhraseTripletExamples_complete*.json
+ingredientNameOnlyTripletExamples_complete*.json
+.DS_Store

@@ -1,0 +1,8 @@
+model_weights.data*
+__pycache__
+.DS_Store
+
+# ignore computed examples
+data/train_examples.json
+data/dev_examples.json
+data/test_examples.json
