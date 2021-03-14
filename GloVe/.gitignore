@@ -37,3 +37,8 @@ build/*
 
 # OS X stuff
 ._*
+
+# ignore corpuses, training artifacts, and trained embeddings (all very large)
+corpuses/*
+training_artifacts/*
+recipe_embeddings/*
