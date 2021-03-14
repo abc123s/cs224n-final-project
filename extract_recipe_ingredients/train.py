@@ -30,7 +30,7 @@ preprocessors = {
     preprocess_combined,  # combined dataset (nyt and manually tagged)
 }
 
-PREPROCESSOR = 'manual'
+PREPROCESSOR = 'simple'
 preprocess = preprocessors[PREPROCESSOR]
 
 MANUAL_EXAMPLE_WEIGHT = 1
@@ -63,8 +63,8 @@ RECURRENT_UNITS = 512
 NUM_RECURRENT_LAYERS = 2
 REGULARIZER = None
 REGULARIZATION_FACTOR = 0
-DROPOUT_RATE = 0
-RECURRENT_DROPOUT_RATE = 0
+DROPOUT_RATE = 0.2
+RECURRENT_DROPOUT_RATE = 0.2
 PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
 
 model = build_model(
@@ -99,7 +99,7 @@ epoch_tensorboard_callback = tf.keras.callbacks.TensorBoard(
     log_dir=experiment_dir + "/epoch_logs", histogram_freq=1)
 
 # fit model:
-EPOCHS = 10
+EPOCHS = 6
 history = model.fit(train_batches,
                     epochs=EPOCHS,
                     validation_data=dev_batches,
