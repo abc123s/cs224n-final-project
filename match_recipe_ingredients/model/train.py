@@ -12,8 +12,8 @@ from evaluate import evaluate
 
 # hyperparameters
 # model structure
-WORD_EMBEDDING_SIZE = 64
-PRETRAINED_EMBEDDINGS = None
+WORD_EMBEDDING_SIZE = 100
+PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
 SENTENCE_EMBEDDING_SIZE = 64
 EMBEDDING_ARCHITECTURE = 'simple'
 USE_TAGS = True

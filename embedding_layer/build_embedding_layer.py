@@ -14,7 +14,19 @@ EMBEDDING_PATHS = {
         '100': os.path.join(DIR_PATH, './pretrained_embeddings/glove.6B.100d.txt'),
         '200': os.path.join(DIR_PATH, './pretrained_embeddings/glove.6B.200d.txt'),
         '300': os.path.join(DIR_PATH, './pretrained_embeddings/glove.6B.300d.txt'),
-    }
+    },
+    'ing_ins_ing_doc': {
+        '100': os.path.join(DIR_PATH, './pretrained_embeddings/ing_ins_ing_doc_100d.txt'),
+    },
+    'ing_ins_rec_doc': {
+        '100': os.path.join(DIR_PATH, './pretrained_embeddings/ing_ins_rec_doc_100d.txt'),
+    },
+    'ing_only_ing_doc': {
+        '100': os.path.join(DIR_PATH, './pretrained_embeddings/ing_only_ing_doc_100d.txt'),
+    },
+    'ing_only_rec_doc': {
+        '100': os.path.join(DIR_PATH, './pretrained_embeddings/ing_only_rec_doc_100d.txt'),
+    },
 }
 def load_pretrained_embedding(pretrained_embeddings, embedding_units):
     embedding_type_paths = EMBEDDING_PATHS.get(pretrained_embeddings)
