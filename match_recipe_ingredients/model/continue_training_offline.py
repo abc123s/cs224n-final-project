@@ -20,7 +20,7 @@ with open(os.path.join(os.path.dirname(__file__), "data/trainMatchedTrainingExam
 ORIGINAL_EXPERIMENT_DIR = "experiments/20201126_0602_da31a2a"
 RETRAINING_EPOCHS = 1
 RETRAINING_EXAMPLE_TYPE = "offline_full_complete_with_no_match"
-RETRAINING_ROUNDS = 2 # how many rounds of RETRAINING_EPOCHS to run (in series)
+RETRAINING_ROUNDS = 5 # how many rounds of RETRAINING_EPOCHS to run (in series)
 
 # load original experiment params
 with open(ORIGINAL_EXPERIMENT_DIR + "/params.json", "r") as f:
