@@ -1,0 +1,12 @@
+{
+    "train": {
+        "accuracy": 0.9378602558695347,
+        "top-3 accuracy": 0.9523407844791227,
+        "top-5 accuracy": 0.9526219597919303
+    },
+    "test": {
+        "accuracy": 0.856,
+        "top-3 accuracy": 0.901,
+        "top-5 accuracy": 0.904
+    }
+}
