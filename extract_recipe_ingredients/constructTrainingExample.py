@@ -15,7 +15,7 @@ from masked_accuracy import SparseCategoricalAccuracyMaskZeros
 
 ingredientPhraseTokenizer = IngredientPhraseTokenizer()
 
-_, _, _, word_encoder, tag_encoder = preprocess("./data")
+_, _, _, _, _, word_encoder, tag_encoder = preprocess("./data")
 
 experiment_dir = "experiments/20200616_1512_8aead79"
 

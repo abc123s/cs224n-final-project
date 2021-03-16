@@ -98,4 +98,4 @@ def preprocess(data_path):
     dev_dataset = build_dataset(dev_examples, word_encoder, tag_encoder)
     test_dataset = build_dataset(test_examples, word_encoder, tag_encoder)
 
-    return train_dataset, dev_dataset, test_dataset, word_encoder, tag_encoder
+    return train_dataset, dev_dataset, test_dataset, None, None, word_encoder, tag_encoder

@@ -64,11 +64,11 @@ with open(experiment_dir + "/params.json", "r") as f:
 # fine-tuned models (which use two different datasets)
 vocab_examples = example_loader[params.get("PREPROCESSOR", "original")]()
 if params.get("ORIGINAL_EXPERIMENT_DIR", None):
-    _, dev_data, _, word_encoder, tag_encoder = preprocess_manual(
+    _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess_manual(
         "./data", vocab_examples)
 else:
     preprocess = preprocessors[params.get("PREPROCESSOR", 'original')]
-    _, dev_data, _, word_encoder, tag_encoder = preprocess("./data")
+    _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess("./data")
 
 # build and compile model based on experiment params:
 model = build_model(

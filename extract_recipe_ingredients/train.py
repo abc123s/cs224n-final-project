@@ -42,14 +42,14 @@ SHUFFLE_BUFFER_SIZE = 200000
 
 # load data and encoders, separate data into batches and pad
 if PREPROCESSOR == 'combined':
-    train_data, dev_data, _, word_encoder, tag_encoder = preprocess(
+    train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
         "./data", MANUAL_EXAMPLE_WEIGHT)
     train_batches = (
         train_data.take(TRAIN_SIZE).shuffle(SHUFFLE_BUFFER_SIZE).padded_batch(
             128, padded_shapes=([None], [None], [None])))
 
 else:
-    train_data, dev_data, _, word_encoder, tag_encoder = preprocess("./data")
+    train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess("./data")
     train_batches = (
         train_data.take(TRAIN_SIZE).shuffle(SHUFFLE_BUFFER_SIZE).padded_batch(
             128, padded_shapes=([None], [None])))

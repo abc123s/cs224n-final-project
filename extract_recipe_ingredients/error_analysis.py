@@ -14,7 +14,7 @@ from masked_accuracy import SparseCategoricalAccuracyMaskZeros
 
 # modify this line to change which experiment directory you wish to
 # run an error analysis on
-experiment_dir = "experiments/20200819_2356_f360e93"
+experiment_dir = "experiments/20210315_0004_a01a9f9"
 
 preprocessors = {
     'simple': preprocess_simple,
@@ -64,11 +64,11 @@ with open(experiment_dir + "/params.json", "r") as f:
 if params.get("ORIGINAL_EXPERIMENT_DIR", None):
     original_examples = example_loader[params.get("PREPROCESSOR",
                                                   "original")]()
-    _, dev_data, _, word_encoder, tag_encoder = preprocess_manual(
+    _, dev_data, _, _, tokenized_dev_examples, word_encoder, tag_encoder = preprocess_manual(
         "./data", original_examples)
 else:
     preprocess = preprocessors[params.get("PREPROCESSOR", 'original')]
-    _, dev_data, _, word_encoder, tag_encoder = preprocess("./data")
+    _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess("./data")
 
 # build and compile model based on experiment params:
 model = build_model(
@@ -80,7 +80,7 @@ model = build_model(
     regularization_factor=params.get("REGULARIZATION_FACTOR", 0),
     dropout_rate=params.get("DROPOUT_RATE", 0),
     recurrent_dropout_rate=params["RECURRENT_DROPOUT_RATE"],
-    vocab_size=word_encoder.vocab_size,
+    word_encoder=word_encoder,
     tag_size=tag_encoder.vocab_size,
 )
 
@@ -99,6 +99,7 @@ incorrect_sentences = []
 all_predictions = []
 all_labels = []
 
+dev_example_index = 0
 for sentences, labels in dev_batches:
     model_outputs = model.predict(sentences)
     for model_output, label, sentence in zip(model_outputs, labels, sentences):
@@ -137,10 +138,13 @@ for sentences, labels in dev_batches:
 
         if len(correct) != sum(correct):
             incorrect_sentences.append((
+                tokenized_dev_examples[dev_example_index],
                 decoded_sentence,
                 decoded_prediction,
                 decoded_answer,
             ))
+        
+        dev_example_index += 1
 
 # randomly sample sentence errors and write to csv for error analysis
 sample_errors = random.choices(incorrect_sentences, k=100)
@@ -148,8 +152,9 @@ sample_errors = random.choices(incorrect_sentences, k=100)
 with open(experiment_dir + '/error_analysis.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
 
-    for sentence, prediction, answer in sample_errors:
-        writer.writerow(sentence)
+    for original_sentence, decoded_sentence, prediction, answer in sample_errors:
+        writer.writerow(original_sentence)
+        writer.writerow(decoded_sentence)
         writer.writerow(prediction)
         writer.writerow(answer)
         writer.writerow([])

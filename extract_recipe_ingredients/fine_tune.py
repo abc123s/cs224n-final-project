@@ -50,7 +50,7 @@ example_loader = {
 }
 
 # previous experiment to fine tune
-original_experiment_dir = "experiments/20200615_1937_f9e6172"
+original_experiment_dir = "experiments/20210315_1854_d5ecc10"
 
 # load experiment params
 with open(original_experiment_dir + "/params.json", "r") as f:
@@ -62,8 +62,8 @@ new_params = {
     "EPOCHS": 20,
     "REGULARIZER": None,
     "REGULARIZATION_FACTOR": 0,
-    "DROPOUT_RATE": 0,
-    "RECURRENT_DROPOUT_RATE": 0,
+    "DROPOUT_RATE": 0.6,
+    "RECURRENT_DROPOUT_RATE": 0.6,
     "OPTIMIZER": "adam"
 }
 
@@ -78,7 +78,7 @@ params = {
 original_examples = example_loader[params.get("PREPROCESSOR", "original")]()
 
 # grab train and dev sets to do fine-tuning on
-train_data, dev_data, _, word_encoder, tag_encoder = preprocess(
+train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
     "./data", original_examples)
 
 train_batches = train_data.padded_batch(128, padded_shapes=([None], [None]))

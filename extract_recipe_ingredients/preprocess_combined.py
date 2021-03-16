@@ -47,4 +47,4 @@ def preprocess(data_path, manual_weight=5):
     ], word_encoder, tag_encoder)
     dev_dataset = build_dataset(manual_dev_examples, word_encoder, tag_encoder)
 
-    return train_dataset, dev_dataset, None, word_encoder, tag_encoder
+    return train_dataset, dev_dataset, None, None, None, word_encoder, tag_encoder

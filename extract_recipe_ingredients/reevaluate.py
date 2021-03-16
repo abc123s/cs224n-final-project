@@ -14,7 +14,7 @@ with open(experiment_dir + "/params.json", "r") as f:
     params = json.load(f)
 
 # grab train and dev sets
-all_train_data, dev_data, _, word_encoder, tag_encoder = preprocess("./data")
+all_train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess("./data")
 
 train_data = all_train_data.take(params["TRAIN_SIZE"])
 
