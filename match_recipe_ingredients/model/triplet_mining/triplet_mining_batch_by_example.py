@@ -30,7 +30,7 @@ for training_example in training_examples:
 # generate 50 hard and 50 semi-hard training examples for each ingredient_id
 # as in FaceNet, select from all positive examples, but choose
 # hard or semi-hard negative examples
-def generate_batch(model, batch_size, triplets_per_example, include_no_match, margin):
+def generate_batch(model, batch_size, triplets_per_example, include_no_match, margin, pretrained_embeddings = None, embedding_size = None):
     embedding = model.get_layer('embedding')
 
     # final cleaning of training examples
@@ -49,7 +49,11 @@ def generate_batch(model, batch_size, triplets_per_example, include_no_match, ma
     ingredient_dictionary_entries = [entry for _, entry in flat_ingredient_dictionary]
 
     # compute embeddings of ingredient dictionary entries
-    ingredient_dictionary_entry_embeddings = embedding(preprocess_test(ingredient_dictionary_entries))
+    ingredient_dictionary_entry_embeddings = embedding(preprocess_test(
+        ingredient_dictionary_entries,
+        pretrained_embeddings,
+        embedding_size
+    ))
 
     # reassemble into dictionary
     embedded_ingredient_dictionary = {}
@@ -69,7 +73,11 @@ def generate_batch(model, batch_size, triplets_per_example, include_no_match, ma
         # compute embeddings of selected training examples
         batch_text = [training_example["text"] for training_example in training_example_batch]
         batch_ingredient_ids = [training_example["ingredient_id"] for training_example in training_example_batch]
-        batch_embeddings = embedding(preprocess_test(batch_text))
+        batch_embeddings = embedding(preprocess_test(
+            batch_text,
+            pretrained_embeddings,
+            embedding_size
+        ))
 
         for example_text, example_ingredient_id, example_embedding in zip(batch_text, batch_ingredient_ids, batch_embeddings):
             anchor = example_text
@@ -125,4 +133,8 @@ def generate_batch(model, batch_size, triplets_per_example, include_no_match, ma
             ]
             batch_triplets.extend([[anchor, positive, negative] for negative in selected_negatives])
     
-    return preprocess_train_batch(batch_triplets)
+    return preprocess_train_batch(
+        batch_triplets,
+        pretrained_embeddings,
+        embedding_size
+    )

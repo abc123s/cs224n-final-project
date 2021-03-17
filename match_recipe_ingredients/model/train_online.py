@@ -15,16 +15,6 @@ from model.model import build_model
 from evaluate import evaluate
 from triplet_mining import triplet_mining_batch_by_example, triplet_mining_batch_by_ingredient
 
-# figure out vocab size so we can construct the model
-ingredientPhraseTokenizer = IngredientPhraseTokenizer()
-TokenTextEncoder = tfds.deprecated.text.TokenTextEncoder
-
-with open(os.path.join(os.path.dirname(__file__), "preprocessing/vocab_list.json")) as vocab_list_data:
-    vocab_list = json.load(vocab_list_data)    
-
-word_encoder = TokenTextEncoder(vocab_list,
-                                tokenizer=ingredientPhraseTokenizer)
-
 # ingredient dictionary
 with open(os.path.join(os.path.dirname(__file__), "data/ingredientDictionary.json")) as ingredient_dictionary_data:
     ingredient_dictionary = json.load(ingredient_dictionary_data)
@@ -41,6 +31,7 @@ params = {}
 # model structure
 params["WORD_EMBEDDING_SIZE"] = 64
 params["PRETRAINED_EMBEDDINGS"] = None
+params["USE_PRETRAINED_EMBEDDING_VOCAB"] = False
 params["SENTENCE_EMBEDDING_SIZE"] = 64
 params["EMBEDDING_ARCHITECTURE"] = 'simple'
 
@@ -70,7 +61,9 @@ if params["TRAINING_METHOD"] == "triplet_mining_batch_by_example":
             batch_size = params["BATCH_SIZE"],
             triplets_per_example = params["TRIPLETS_PER_EXAMPLE"],
             include_no_match = params["INCLUDE_NO_MATCH"],
-            margin = params["TRIPLET_MARGIN"]
+            margin = params["TRIPLET_MARGIN"],
+            pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+            embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
         )
         return batch
 elif params["TRAINING_METHOD"] == "triplet_mining_batch_by_ingredient":
@@ -80,9 +73,17 @@ elif params["TRAINING_METHOD"] == "triplet_mining_batch_by_ingredient":
         return triplet_mining_batch_by_ingredient.generate_batch(
             model, 
             ingredient_ids = random.sample(ingredient_dictionary.keys(), params["INGREDIENT_IDS_PER_BATCH"]), 
-            margin = params["TRIPLET_MARGIN"]
+            margin = params["TRIPLET_MARGIN"],
+            pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+            embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
         )
         return batch
+
+# create word_encoder (to get vocab size)
+word_encoder = create_word_encoder(
+    pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+    embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+)
 
 # build and compile model based on specified hyperparams:
 model, loss = build_model(
@@ -138,7 +139,11 @@ while total_epochs < params["EPOCHS"]:
     total_epochs += epochs_to_train
 
     # evaluate model and save metrics:
-    evaluation = evaluate(model)
+    evaluation = evaluate(
+        model,
+        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+        embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+    )
 
     with open(experiment_dir + f"/results_{total_epochs}.json", "w") as f:
         json.dump(evaluation, f, indent=4)

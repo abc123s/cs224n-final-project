@@ -14,6 +14,7 @@ from evaluate import evaluate
 # model structure
 WORD_EMBEDDING_SIZE = 100
 PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
+USE_PRETRAINED_EMBEDDING_VOCAB = True
 SENTENCE_EMBEDDING_SIZE = 128
 EMBEDDING_ARCHITECTURE = 'bidirectional'
 USE_TAGS = True
@@ -41,7 +42,7 @@ EPOCHS = 1
 
 # raw training examples (not yet made into triplets)
 with open(os.path.join(os.path.dirname(__file__), "data/trainMatchedTrainingExamples.json")) as training_examples_data:
-    raw_training_examples = json.load(training_examples_data)    
+    raw_training_examples = json.load(training_examples_data)
 
 if USE_TAGS:
     if TRAINING_EXAMPLE_TYPE == "offline_tagged_complete":
@@ -53,7 +54,9 @@ if USE_TAGS:
             },
             shuffle_buffer_size = SHUFFLE_BUFFER_SIZE,
             batch_size = BATCH_SIZE,
-            shuffle_before_batch = SHUFFLE_BEFORE_BATCH
+            shuffle_before_batch = SHUFFLE_BEFORE_BATCH,
+            pretrained_embeddings = PRETRAINED_EMBEDDINGS if USE_PRETRAINED_EMBEDDING_VOCAB else None,
+            embedding_size = WORD_EMBEDDING_SIZE if USE_PRETRAINED_EMBEDDING_VOCAB else None
         )
     elif TRAINING_EXAMPLE_TYPE == "offline_tagged_complete_with_no_match":
         dataset, word_encoder, tag_size = preprocess_train_raw(
@@ -64,7 +67,9 @@ if USE_TAGS:
             },
             shuffle_buffer_size = SHUFFLE_BUFFER_SIZE,
             batch_size = BATCH_SIZE,
-            shuffle_before_batch = SHUFFLE_BEFORE_BATCH
+            shuffle_before_batch = SHUFFLE_BEFORE_BATCH,
+            pretrained_embeddings = PRETRAINED_EMBEDDINGS if USE_PRETRAINED_EMBEDDING_VOCAB else None,
+            embedding_size = WORD_EMBEDDING_SIZE if USE_PRETRAINED_EMBEDDING_VOCAB else None
         )
     else:
         raise ValueError(f'Selected training example type {TRAINING_EXAMPLE_TYPE} that is not compatible with the USE_TAGS flag.')
@@ -87,7 +92,9 @@ else:
         training_examples,
         shuffle_buffer_size = SHUFFLE_BUFFER_SIZE,
         batch_size = BATCH_SIZE,
-        shuffle_before_batch = SHUFFLE_BEFORE_BATCH
+        shuffle_before_batch = SHUFFLE_BEFORE_BATCH,
+        pretrained_embeddings = PRETRAINED_EMBEDDINGS if USE_PRETRAINED_EMBEDDING_VOCAB else None,
+        embedding_size = WORD_EMBEDDING_SIZE if USE_PRETRAINED_EMBEDDING_VOCAB else None
     )
     tag_size = None
 
@@ -136,6 +143,7 @@ with open(experiment_dir + "/params.json", "w") as f:
         {
             "WORD_EMBEDDING_SIZE": WORD_EMBEDDING_SIZE,
             "PRETRAINED_EMBEDDINGS": PRETRAINED_EMBEDDINGS,
+            "USE_PRETRAINED_EMBEDDING_VOCAB": USE_PRETRAINED_EMBEDDING_VOCAB,
             "SENTENCE_EMBEDDING_SIZE": SENTENCE_EMBEDDING_SIZE,
             "EMBEDDING_ARCHITECTURE": EMBEDDING_ARCHITECTURE,
             "USE_TAGS": USE_TAGS,
@@ -162,7 +170,11 @@ with open(experiment_dir + "/params.json", "w") as f:
 model.save_weights(experiment_dir + "/model_weights")
 
 # evaluate model and save metrics:
-evaluation = evaluate(model)
+evaluation = evaluate(
+    model,
+    pretrained_embeddings = PRETRAINED_EMBEDDINGS if USE_PRETRAINED_EMBEDDING_VOCAB else None,
+    embedding_size = WORD_EMBEDDING_SIZE if USE_PRETRAINED_EMBEDDING_VOCAB else None
+)
 
 with open(experiment_dir + "/results.json", "w") as f:
     json.dump(evaluation, f, indent=4)

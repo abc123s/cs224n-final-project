@@ -19,8 +19,8 @@ with open(os.path.join(os.path.dirname(__file__), "data/trainMatchedTrainingExam
 # hyperparameters for re-training
 ORIGINAL_EXPERIMENT_DIR = "experiments/20201126_0602_da31a2a"
 RETRAINING_EPOCHS = 1
-RETRAINING_EXAMPLE_TYPE = "offline_full_complete_with_no_match"
-RETRAINING_ROUNDS = 5 # how many rounds of RETRAINING_EPOCHS to run (in series)
+RETRAINING_EXAMPLE_TYPE = "offline_tagged_complete_with_no_match"
+RETRAINING_ROUNDS = 7 # how many rounds of RETRAINING_EPOCHS to run (in series)
 
 # load original experiment params
 with open(ORIGINAL_EXPERIMENT_DIR + "/params.json", "r") as f:
@@ -49,7 +49,9 @@ if params["USE_TAGS"]:
             },
             shuffle_buffer_size = params["SHUFFLE_BUFFER_SIZE"],
             batch_size = params["BATCH_SIZE"],
-            shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"]
+            shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"],
+            pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+            embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
         )
     elif params["RETRAINING_EXAMPLE_TYPE"] == "offline_tagged_complete_with_no_match":
         dataset, word_encoder, tag_size = preprocess_train_raw(
@@ -60,7 +62,9 @@ if params["USE_TAGS"]:
             },
             shuffle_buffer_size = params["SHUFFLE_BUFFER_SIZE"],
             batch_size = params["BATCH_SIZE"],
-            shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"]
+            shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"],
+            pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+            embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
         )
     else:
         raise ValueError(f'Selected training example type {params["RETRAINING_EXAMPLE_TYPE"]} that is not compatible with the USE_TAGS flag.')
@@ -83,7 +87,9 @@ else:
         training_examples,
         shuffle_buffer_size = params["SHUFFLE_BUFFER_SIZE"],
         batch_size = params["BATCH_SIZE"],
-        shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"]
+        shuffle_before_batch = params["SHUFFLE_BEFORE_BATCH"],
+        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+        embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
     )
     tag_size = None
 
@@ -144,7 +150,11 @@ for i in range(RETRAINING_ROUNDS):
     model.save_weights(experiment_dir + "/model_weights")
 
     # evaluate model and save metrics:
-    evaluation = evaluate(model)
+    evaluation = evaluate(
+        model,
+        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+        embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+    )
 
     with open(experiment_dir + "/results.json", "w") as f:
         json.dump(evaluation, f, indent=4)

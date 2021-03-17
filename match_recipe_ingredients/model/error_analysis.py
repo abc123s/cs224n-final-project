@@ -7,20 +7,13 @@ import numpy as np
 import tensorflow_datasets as tfds
 
 from preprocessing.tokenizer import IngredientPhraseTokenizer, TagTokenizer
-from preprocessing.preprocess import preprocess_test
+from preprocessing.preprocess import preprocess_test, create_word_encoder
 
 from model.model import build_model
 
 ingredientPhraseTokenizer = IngredientPhraseTokenizer()
 tagTokenizer = TagTokenizer()
 TokenTextEncoder = tfds.deprecated.text.TokenTextEncoder
-
-# create word_encoder (to get vocab size)
-with open(os.path.join(os.path.dirname(__file__), "preprocessing/vocab_list.json")) as vocab_list_data:
-    vocab_list = json.load(vocab_list_data)    
-
-word_encoder = TokenTextEncoder(vocab_list,
-                                tokenizer=ingredientPhraseTokenizer)
 
 # create tag_encoder (to get tag vocab size)
 with open(os.path.join(os.path.dirname(__file__), "preprocessing/tag_list.json")) as tag_list_data:
@@ -55,7 +48,7 @@ def select_ingredient_dictionary_match(embedded_example, embedded_ingredient_dic
     )
 
     
-def grade(examples, embedding, embedded_ingredient_dictionary, use_tags, training_count):
+def grade(examples, embedding, embedded_ingredient_dictionary, use_tags, training_count, pretrained_embeddings = None, embedding_size = None):
     # compute embeddings of examples
     raw_examples = (
         [[example["original"], example["tags"]] for example in examples]
@@ -65,7 +58,7 @@ def grade(examples, embedding, embedded_ingredient_dictionary, use_tags, trainin
     example_embeddings = [
         example_embedding.numpy() 
         for example_embedding in embedding(
-            preprocess_test(raw_examples),
+            preprocess_test(raw_examples, pretrained_embeddings, embedding_size),
             training=False
         )
     ]
@@ -139,7 +132,7 @@ def write_results(results, file_name):
         for result in results:
             writer.writerow([result["id"], result["raw"], result["encoded"], result["pred"], result["label"], result["dist"], result["training_count"], result["not_exact"]])
 
-def error_analysis(model):
+def error_analysis(model, word_encoder, pretrained_embeddings = None, embedding_size = None):
     # determine model whether embedding takes tags as input as well or just tokens
     use_tags = True
     try:
@@ -162,7 +155,7 @@ def error_analysis(model):
 
         # compute embeddings of ingredient dictionary entries
         ingredient_dictionary_entry_embeddings = embedding(
-            preprocess_test(ingredient_dictionary_entries),
+            preprocess_test(ingredient_dictionary_entries, pretrained_embeddings, embedding_size),
             training = False
         )
 
@@ -183,8 +176,8 @@ def error_analysis(model):
             for label in training_example_labels
         }
 
-        train_results = grade(train_examples, embedding, embedded_ingredient_dictionary, use_tags, training_count)
-        test_results = grade(test_examples, embedding, embedded_ingredient_dictionary, use_tags, training_count)
+        train_results = grade(train_examples, embedding, embedded_ingredient_dictionary, use_tags, training_count, pretrained_embeddings, embedding_size)
+        test_results = grade(test_examples, embedding, embedded_ingredient_dictionary, use_tags, training_count, pretrained_embeddings, embedding_size)
 
         write_results(train_results["correct"], "train_correct")
         write_results(train_results["incorrect"], "train_incorrect")
@@ -210,6 +203,12 @@ experiment_dir = "experiments/20210316_1907_9c51b36"
 with open(experiment_dir + "/params.json", "r") as f:
     params = json.load(f)
 
+# create word_encoder (to get vocab size)
+word_encoder = create_word_encoder(
+    pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+    embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+)
+
 # build and compile model based on experiment params:
 model, _ = build_model(
     word_encoder = word_encoder,
@@ -233,4 +232,9 @@ model, _ = build_model(
 model.load_weights(experiment_dir + "/model_weights")
 
 # perform error analysis on model
-error_analysis(model)
+error_analysis(
+    model,
+    word_encoder,
+    pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+    embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+)

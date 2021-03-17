@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import sys
 
 import numpy as np
 
@@ -12,6 +13,8 @@ from preprocessing.tokenizer import IngredientPhraseTokenizer, TagTokenizer
 ingredientPhraseTokenizer = IngredientPhraseTokenizer()
 tagTokenizer = TagTokenizer()
 
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../..'))
+from embedding_layer.build_embedding_layer import load_pretrained_embedding
 
 # ingredient dictionary (used to generate triplets from raw examples)
 with open(os.path.join(os.path.dirname(__file__), "../data/ingredientDictionary.json")) as ingredient_dictionary_data:
@@ -21,8 +24,16 @@ with open(os.path.join(os.path.dirname(__file__), "../data/ingredientDictionary.
 with open(os.path.join(os.path.dirname(__file__), "vocab_list.json")) as vocab_list_data:
     vocab_list = json.load(vocab_list_data)    
 
-word_encoder = TokenTextEncoder(vocab_list,
-                                tokenizer=ingredientPhraseTokenizer)
+def create_word_encoder(pretrained_embeddings=None, embedding_size=None):
+    final_vocab_list = sorted([
+        *vocab_list,
+        *load_pretrained_embedding(pretrained_embeddings, embedding_size).keys()
+    ]) if pretrained_embeddings else vocab_list
+
+    word_encoder = TokenTextEncoder(final_vocab_list,
+                                    tokenizer=ingredientPhraseTokenizer)
+    
+    return word_encoder
 
 # create tag_encoder
 with open(os.path.join(os.path.dirname(__file__), "tag_list.json")) as tag_list_data:
@@ -41,7 +52,9 @@ def truncate_or_pad(example):
         return example + [0] * (TRUNCATE_LENGTH - len(example))
 
 # convert triplet training examples into batched tf Dataset
-def preprocess_train(all_examples, shuffle_buffer_size, batch_size, shuffle_before_batch):
+def preprocess_train(all_examples, shuffle_buffer_size, batch_size, shuffle_before_batch, pretrained_embeddings=None, embedding_size=None):
+    word_encoder = create_word_encoder(pretrained_embeddings, embedding_size)
+
     # exclude all examples with empty strings
     # necessary for ingredient name only examples, because there could be tagging mistakes that
     # cause there to be no ingredient name
@@ -74,7 +87,9 @@ def encode_tags(tags, encoded_text):
 
     return [tag_encoder.encode(tag)[0] for tag in tags]
 
-def preprocess_train_raw(raw_examples, triplet_options, shuffle_buffer_size, batch_size, shuffle_before_batch):
+def preprocess_train_raw(raw_examples, triplet_options, shuffle_buffer_size, batch_size, shuffle_before_batch, pretrained_embeddings=None, embedding_size=None):
+    word_encoder = create_word_encoder(pretrained_embeddings, embedding_size)
+    
     triplets = []
     for raw_example in raw_examples:
         example_text = raw_example["original"]
@@ -170,7 +185,9 @@ def preprocess_train_raw(raw_examples, triplet_options, shuffle_buffer_size, bat
 
 # convert batch of manually selected training examples
 # into format accepted by model.fit
-def preprocess_train_batch(example_batch):
+def preprocess_train_batch(example_batch, pretrained_embeddings=None, embedding_size=None):
+    word_encoder = create_word_encoder(pretrained_embeddings, embedding_size)
+
     processed_anchors = []
     processed_positives = []
     processed_negatives = []
@@ -189,7 +206,9 @@ def preprocess_train_batch(example_batch):
 
 # convert list of raw test examples into format
 # that embedding predict on 
-def preprocess_test(examples):
+def preprocess_test(examples, pretrained_embeddings=None, embedding_size=None):
+    word_encoder = create_word_encoder(pretrained_embeddings, embedding_size)
+
     use_tags = isinstance(examples[0], list)
     if use_tags:
         encoded_example_text = []

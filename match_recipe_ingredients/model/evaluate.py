@@ -30,7 +30,7 @@ def select_ingredient_dictionary_match(embedded_example, embedded_ingredient_dic
 
     return [ingredient_id for ingredient_id, _ in ranked_ingredient_dictionary_entries[0: 5]]
 
-def accuracy(examples, embedding, embedded_ingredient_dictionary, use_tags):
+def accuracy(examples, embedding, embedded_ingredient_dictionary, use_tags, pretrained_embeddings=None, embedding_size=None):
     # compute embeddings of examples
     raw_examples = (
         [[example["original"], example["tags"]] for example in examples]
@@ -40,7 +40,11 @@ def accuracy(examples, embedding, embedded_ingredient_dictionary, use_tags):
     example_embeddings = [
         example_embedding.numpy() 
         for example_embedding in embedding(
-            preprocess_test(raw_examples),
+            preprocess_test(
+                raw_examples,
+                pretrained_embeddings,
+                embedding_size
+            ),
             training=False
         )
     ]
@@ -78,7 +82,7 @@ def accuracy(examples, embedding, embedded_ingredient_dictionary, use_tags):
         "top-5 accuracy": top_5_correct_examples / total_examples,
     }
 
-def evaluate(model):
+def evaluate(model, pretrained_embeddings=None, embedding_size=None):
     # determine model whether embedding takes tags as input as well or just tokens
     use_tags = True
     try:
@@ -101,7 +105,11 @@ def evaluate(model):
 
         # compute embeddings of ingredient dictionary entries
         ingredient_dictionary_entry_embeddings = embedding(
-            preprocess_test(ingredient_dictionary_entries),
+            preprocess_test(
+                ingredient_dictionary_entries,
+                pretrained_embeddings,
+                embedding_size
+            ),
             training = False
         )
 
@@ -111,6 +119,6 @@ def evaluate(model):
             embedded_ingredient_dictionary[ingredient_id] = entry_embedding.numpy()
 
         return {
-            "train": accuracy(train_examples, embedding, embedded_ingredient_dictionary, use_tags),
-            "test": accuracy(test_examples, embedding, embedded_ingredient_dictionary, use_tags),
+            "train": accuracy(train_examples, embedding, embedded_ingredient_dictionary, use_tags, pretrained_embeddings, embedding_size),
+            "test": accuracy(test_examples, embedding, embedded_ingredient_dictionary, use_tags, pretrained_embeddings, embedding_size),
         }

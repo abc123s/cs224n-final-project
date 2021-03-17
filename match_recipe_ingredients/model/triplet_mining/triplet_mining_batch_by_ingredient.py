@@ -31,7 +31,7 @@ for training_example in training_examples:
 # generate 50 hard and 50 semi-hard training examples for each ingredient_id
 # as in FaceNet, select from all positive examples, but choose
 # hard or semi-hard negative examples
-def generate_batch(model, ingredient_ids, margin):
+def generate_batch(model, ingredient_ids, margin, pretrained_embeddings = None, embedding_size = None):
     embedding = model.get_layer('embedding')
 
     # compute embeddings for all examples in batch as well as embeddings
@@ -46,10 +46,14 @@ def generate_batch(model, ingredient_ids, margin):
         ingredient_examples = grouped_training_examples[ingredient_id]
 
         # compute embeddings for both of the above
-        embedded_ingredient_name, *embedded_ingredient_examples = embedding(preprocess_test([
-            ingredient_name,
-            *ingredient_examples,
-        ]))
+        embedded_ingredient_name, *embedded_ingredient_examples = embedding(preprocess_test(
+            [
+                ingredient_name,
+                *ingredient_examples,
+            ],
+            pretrained_embeddings,
+            embedding_size
+        ))
 
         # store embeddings of ingredient dictionary entries
         batch_ingredient_dictionary_embeddings[ingredient_id] = embedded_ingredient_name.numpy()
@@ -121,7 +125,11 @@ def generate_batch(model, ingredient_ids, margin):
                         selected_semi_hard_negative_example[1],
                     ])
 
-    return preprocess_train_batch(hard_triplet_examples)
+    return preprocess_train_batch(
+        hard_triplet_examples,
+        pretrained_embeddings,
+        embedding_size
+    )
 
 
 

@@ -5,19 +5,13 @@ import numpy as np
 
 import tensorflow_datasets as tfds
 
-from preprocessing.preprocess import preprocess_test
+from preprocessing.preprocess import preprocess_test, create_word_encoder
 from preprocessing.tokenizer import IngredientPhraseTokenizer
 
 from model.model import build_model
 
 ingredientPhraseTokenizer = IngredientPhraseTokenizer()
 TokenTextEncoder = tfds.deprecated.text.TokenTextEncoder
-
-with open(os.path.join(os.path.dirname(__file__), "preprocessing/vocab_list.json")) as vocab_list_data:
-    vocab_list = json.load(vocab_list_data)    
-
-word_encoder = TokenTextEncoder(vocab_list,
-                                tokenizer=ingredientPhraseTokenizer)
 
 # ingredient dictionary to match to
 with open(os.path.join(os.path.dirname(__file__), "data/ingredientDictionary.json")) as ingredient_dictionary_data:
@@ -28,6 +22,12 @@ experiment_dir = "experiments/20201118_1405_3cc2903"
 # load experiment params
 with open(experiment_dir + "/params.json", "r") as f:
     params = json.load(f)
+
+# create word_encoder (to get vocab size)
+word_encoder = create_word_encoder(
+    pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+    embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+)
 
 # build and compile model based on experiment params:
 model, _ = build_model(
@@ -62,7 +62,11 @@ ingredient_dictionary_entries = [entry for _, entry in flat_ingredient_dictionar
 
 # compute embeddings of ingredient dictionary entries
 ingredient_dictionary_entry_embeddings = embedding(
-    preprocess_test(ingredient_dictionary_entries),
+    preprocess_test(
+        ingredient_dictionary_entries,
+        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+        embedding_size = params["WORD_EMBEDDING_SIZE"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+    ),
     training = False
 )
 
