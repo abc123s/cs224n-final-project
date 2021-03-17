@@ -70,6 +70,13 @@ def grade(examples, embedding, embedded_ingredient_dictionary, use_tags, trainin
         )
     ]
 
+    # compute encoded examples for error analysis purposes (e.g. to see if
+    # out of vocab is a big issue)
+    encoded_examples = [
+        word_encoder.decode(word_encoder.encode(example["original"]))
+        for example in examples
+    ]
+
     # match examples to ingredient dictionary based on distance of embeddings
     example_preds = []
     example_pred_dists = []
@@ -95,11 +102,12 @@ def grade(examples, embedding, embedded_ingredient_dictionary, use_tags, trainin
 
     correct_examples = []
     incorrect_examples = []
-    for id, raw, pred, label, dist, not_exact in zip(example_ids, raw_examples, example_preds, example_labels, example_pred_dists, example_not_exacts):        
+    for id, raw, encoded, pred, label, dist, not_exact in zip(example_ids, raw_examples, encoded_examples, example_preds, example_labels, example_pred_dists, example_not_exacts):        
         if pred == label:
             correct_examples.append({
                 "id": id,
                 "raw": raw[0] if use_tags else raw,
+                "encoded": encoded,
                 "pred": ingredient_dictionary[pred],
                 "label": label and ingredient_dictionary[label],
                 "training_count": training_count.get(label, 0),
@@ -110,6 +118,7 @@ def grade(examples, embedding, embedded_ingredient_dictionary, use_tags, trainin
             incorrect_examples.append({
                 "id": id,
                 "raw": raw[0] if use_tags else raw,
+                "encoded": encoded,
                 "pred": ingredient_dictionary[pred],
                 "label": label and ingredient_dictionary[label],
                 "training_count": training_count.get(label, 0),
@@ -125,10 +134,10 @@ def write_results(results, file_name):
     with open(experiment_dir + '/' + file_name + '.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
 
-        writer.writerow(["id", "raw", "pred", "label", "dist", "training_count", "not_exact"])
+        writer.writerow(["id", "raw", "encoded", "pred", "label", "dist", "training_count", "not_exact"])
 
         for result in results:
-            writer.writerow([result["id"], result["raw"], result["pred"], result["label"], result["dist"], result["training_count"], result["not_exact"]])
+            writer.writerow([result["id"], result["raw"], result["encoded"], result["pred"], result["label"], result["dist"], result["training_count"], result["not_exact"]])
 
 def error_analysis(model):
     # determine model whether embedding takes tags as input as well or just tokens
@@ -195,7 +204,7 @@ def error_analysis(model):
             print(mistake["raw"], mistake["pred"], mistake["label"], mistake["dist"], mistake["training_count"])
         '''
 
-experiment_dir = "experiments/20201203_1651_63cfe44"
+experiment_dir = "experiments/20210316_1907_9c51b36"
 
 # load experiment params
 with open(experiment_dir + "/params.json", "r") as f:
