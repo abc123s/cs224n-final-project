@@ -32,6 +32,8 @@ commit_string = subprocess.check_output(
     ["git", "rev-parse", "--short", "HEAD"]).strip().decode("utf-8")
 experiment_dir = "experiments/" + date_string + "_" + commit_string
 os.mkdir(experiment_dir)
+os.mkdir(experiment_dir + "/logs")
+os.mkdir(experiment_dir + "/results")
 
 # save params down
 with open(experiment_dir + "/params.json", "w") as f:
@@ -86,7 +88,7 @@ training_args = TrainingArguments(
     warmup_steps=500,
     weight_decay=0.01,
     logging_dir=experiment_dir + '/logs',           
-    logging_steps=10
+    logging_strategy="epoch"
 )
 
 trainer = Trainer(
