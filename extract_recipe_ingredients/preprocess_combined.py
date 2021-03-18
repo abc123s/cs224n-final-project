@@ -28,7 +28,7 @@ def build_weighted_dataset(examples_and_weights, word_encoder, tag_encoder):
                                                         tf.int32))
 
 
-def preprocess(data_path, manual_weight=5):
+def preprocess(data_path, manual_weight=5, pretrained_embeddings=None, embedding_size=None):
     nyt_train_examples = load_nyt_examples(data_path, "train")
 
     manual_train_examples = load_manual_examples(data_path,
@@ -36,10 +36,14 @@ def preprocess(data_path, manual_weight=5):
     manual_dev_examples = load_manual_examples(data_path,
                                                "manually_tagged_dev")
 
-    word_encoder, tag_encoder = build_encodings([
-        *nyt_train_examples,
-        *manual_train_examples,
-    ])
+    word_encoder, tag_encoder = build_encodings(
+        [
+            *nyt_train_examples,
+            *manual_train_examples,
+        ],
+        pretrained_embeddings,
+        embedding_size,
+    )
 
     train_dataset = build_weighted_dataset([
         (nyt_train_examples, 1),

@@ -31,6 +31,9 @@ preprocessors = {
 }
 
 PREPROCESSOR = 'simple'
+PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
+USE_PRETRAINED_EMBEDDING_VOCAB = True
+EMBEDDING_UNITS = 100
 preprocess = preprocessors[PREPROCESSOR]
 
 MANUAL_EXAMPLE_WEIGHT = 1
@@ -43,13 +46,21 @@ SHUFFLE_BUFFER_SIZE = 200000
 # load data and encoders, separate data into batches and pad
 if PREPROCESSOR == 'combined':
     train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
-        "./data", MANUAL_EXAMPLE_WEIGHT)
+        "./data",
+        MANUAL_EXAMPLE_WEIGHT,
+        pretrained_embeddings = PRETRAINED_EMBEDDINGS if USE_PRETRAINED_EMBEDDING_VOCAB else None,
+        embedding_size = EMBEDDING_UNITS if USE_PRETRAINED_EMBEDDING_VOCAB else None
+    )
     train_batches = (
         train_data.take(TRAIN_SIZE).shuffle(SHUFFLE_BUFFER_SIZE).padded_batch(
             128, padded_shapes=([None], [None], [None])))
 
 else:
-    train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess("./data")
+    train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
+        "./data",
+        pretrained_embeddings = PRETRAINED_EMBEDDINGS if USE_PRETRAINED_EMBEDDING_VOCAB else None,
+        embedding_size = EMBEDDING_UNITS if USE_PRETRAINED_EMBEDDING_VOCAB else None
+    )
     train_batches = (
         train_data.take(TRAIN_SIZE).shuffle(SHUFFLE_BUFFER_SIZE).padded_batch(
             128, padded_shapes=([None], [None])))
@@ -58,14 +69,12 @@ dev_batches = dev_data.padded_batch(128, padded_shapes=([None], [None]))
 
 # build model:
 ARCHITECTURE = "blstm"
-EMBEDDING_UNITS = 100
 RECURRENT_UNITS = 512
 NUM_RECURRENT_LAYERS = 2
 REGULARIZER = None
 REGULARIZATION_FACTOR = 0
 DROPOUT_RATE = 0.2
 RECURRENT_DROPOUT_RATE = 0.2
-PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
 
 model = build_model(
     architecture=ARCHITECTURE,
