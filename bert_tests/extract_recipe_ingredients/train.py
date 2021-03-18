@@ -88,7 +88,8 @@ training_args = TrainingArguments(
     warmup_steps=500,
     weight_decay=0.01,
     logging_dir=experiment_dir + '/logs',           
-    logging_strategy="epoch"
+    logging_strategy="epoch",
+    evaluation_strategy="epoch"
 )
 
 trainer = Trainer(
