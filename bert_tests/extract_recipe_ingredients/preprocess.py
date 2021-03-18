@@ -52,9 +52,6 @@ def preprocess(model_name, dataset):
 
     train_texts, train_tags = split_examples(train_examples)
 
-    train_texts = train_texts[0:32]
-    train_tags = train_tags[0:32]
-
     with open(f"./data/{dataset}/dev_examples.json", "r") as f:
         dev_examples = json.load(f)
 
@@ -66,7 +63,7 @@ def preprocess(model_name, dataset):
     dev_encodings = tokenizer(dev_texts, is_split_into_words=True, return_offsets_mapping=True, padding=True, truncation=True)
 
     # encode tags
-    unique_tags = sorted(set(tag for doc in dev_tags for tag in doc))
+    unique_tags = sorted(set(tag for doc in train_tags for tag in doc))
     tag2id = {tag: id for id, tag in enumerate(unique_tags)}
     id2tag = {id: tag for tag, id in tag2id.items()}
 
