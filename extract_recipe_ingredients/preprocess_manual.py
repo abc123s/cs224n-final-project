@@ -20,7 +20,7 @@ def load_examples(data_path, dataset_name):
     return examples
 
 
-def preprocess(data_path, examples_for_vocab=None):
+def preprocess(data_path, examples_for_vocab=None, pretrained_embeddings=None, embedding_size=None):
     train_examples = load_examples(data_path, "manually_tagged_train")
     dev_examples = load_examples(data_path, "manually_tagged_dev")
 
@@ -35,9 +35,9 @@ def preprocess(data_path, examples_for_vocab=None):
     ]
 
     if examples_for_vocab:
-        word_encoder, tag_encoder = build_encodings(examples_for_vocab)
+        word_encoder, tag_encoder = build_encodings(examples_for_vocab, pretrained_embeddings, embedding_size)
     else:
-        word_encoder, tag_encoder = build_encodings(train_examples)
+        word_encoder, tag_encoder = build_encodings(train_examples, pretrained_embeddings, embedding_size)
 
     train_dataset = build_dataset(train_examples, word_encoder, tag_encoder)
     dev_dataset = build_dataset(dev_examples, word_encoder, tag_encoder)

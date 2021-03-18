@@ -79,7 +79,11 @@ original_examples = example_loader[params.get("PREPROCESSOR", "original")]()
 
 # grab train and dev sets to do fine-tuning on
 train_data, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
-    "./data", original_examples)
+    "./data",
+    original_examples,
+    pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+    embedding_size = params["EMBEDDING_UNITS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+)
 
 train_batches = train_data.padded_batch(128, padded_shapes=([None], [None]))
 dev_batches = dev_data.padded_batch(128, padded_shapes=([None], [None]))
