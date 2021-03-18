@@ -2,3 +2,4 @@ __pycache__
 .DS_Store
 vocab.txt
 pytorch_model.bin
+checkpoint*
