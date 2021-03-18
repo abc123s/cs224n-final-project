@@ -9,12 +9,16 @@ import decimal
 import math
 import os
 import json
+import sys
 
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
 TokenTextEncoder = tfds.features.text.TokenTextEncoder
 Tokenizer = tfds.features.text.Tokenizer
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+from embedding_layer.build_embedding_layer import load_pretrained_embedding
 
 import pandas as pd
 from tokenizer import IngredientPhraseTokenizer, TagTokenizer, clean
@@ -415,12 +419,20 @@ def csv_file_2_examples(file_name):
     return examples
 
 
-def build_encodings(examples):
+def build_encodings(examples, pretrained_embeddings=None, embedding_size=None):
     vocab_list = sorted(
         set([
             word for example in examples
             for word in ingredientPhraseTokenizer.tokenize(example[0])
         ]))
+    if pretrained_embeddings:
+        vocab_list = sorted(
+            set([
+                *vocab_list,
+                *load_pretrained_embedding(pretrained_embeddings, embedding_size).keys()
+            ])
+        )
+    
     tag_list = sorted(set([tag for example in examples for tag in example[1]]))
 
     word_encoder = TokenTextEncoder(vocab_list,
@@ -463,12 +475,16 @@ def load_examples(data_path, dataset_name):
     return examples
 
 
-def preprocess(data_path):
+def preprocess(data_path, pretrained_embeddings=None, embedding_size=None):
     train_examples = load_examples(data_path, "train")
     dev_examples = load_examples(data_path, "dev")
     test_examples = load_examples(data_path, "test")
 
-    word_encoder, tag_encoder = build_encodings(train_examples)
+    word_encoder, tag_encoder = build_encodings(
+        train_examples, 
+        pretrained_embeddings,
+        embedding_size
+    )
     '''
     encoding_path = data_path + "/encodings"
     word_encoder_path = encoding_path + "/word_encoder"

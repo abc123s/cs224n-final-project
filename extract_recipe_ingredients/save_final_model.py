@@ -65,10 +65,18 @@ with open(experiment_dir + "/params.json", "r") as f:
 vocab_examples = example_loader[params.get("PREPROCESSOR", "original")]()
 if params.get("ORIGINAL_EXPERIMENT_DIR", None):
     _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess_manual(
-        "./data", vocab_examples)
+        "./data",
+        vocab_examples,
+        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+        embedding_size = params["EMBEDDING_UNITS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+    )
 else:
     preprocess = preprocessors[params.get("PREPROCESSOR", 'original')]
-    _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess("./data")
+    _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
+        "./data",
+        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
+        embedding_size = params["EMBEDDING_UNITS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+    )
 
 # build and compile model based on experiment params:
 model = build_model(

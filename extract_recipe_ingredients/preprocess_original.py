@@ -1,7 +1,11 @@
 import os
+import sys
 
 import tensorflow as tf
 import tensorflow_datasets as tfds
+
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
+from embedding_layer.build_embedding_layer import load_pretrained_embedding
 
 TokenTextEncoder = tfds.features.text.TokenTextEncoder
 Tokenizer = tfds.features.text.Tokenizer
@@ -43,9 +47,20 @@ class CustomTokenizer(Tokenizer):
         return [s]
 
 
-def build_encodings(examples):
+def build_encodings(examples, pretrained_embeddings=None, embedding_size=None):
     vocab_list = sorted(
-        set([word for example in examples for word in example[0]]))
+        set([
+            word for example in examples
+            for word in ingredientPhraseTokenizer.tokenize(example[0])
+        ]))
+    if pretrained_embeddings:
+        vocab_list = sorted(
+            set([
+                *vocab_list,
+                *load_pretrained_embedding(pretrained_embeddings, embedding_size).keys()
+            ])
+        )
+
     tag_list = sorted(set([tag for example in examples for tag in example[1]]))
 
     word_encoder = TokenTextEncoder(vocab_list, tokenizer=CustomTokenizer())
@@ -74,12 +89,16 @@ def build_dataset(examples, word_encoder, tag_encoder):
                                           output_types=(tf.int32, tf.int32))
 
 
-def preprocess(data_path):
+def preprocess(data_path, pretrained_embeddings=None, embedding_size=None):
     train_examples = crfFile2Examples(data_path + "/dev.crf")
     dev_examples = crfFile2Examples(data_path + "/dev.crf")
     test_examples = crfFile2Examples(data_path + "/dev.crf")
 
-    word_encoder, tag_encoder = build_encodings(train_examples)
+    word_encoder, tag_encoder = build_encodings(
+        train_examples, 
+        pretrained_embeddings,
+        embedding_size
+    )
     '''
     encoding_path = data_path + "/encodings"
     word_encoder_path = encoding_path + "/word_encoder"
