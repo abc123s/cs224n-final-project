@@ -2,3 +2,4 @@
 fullIngredientPhraseTripletExamples_complete*.json
 ingredientNameOnlyTripletExamples_complete*.json
 .DS_Store
+model_weights.data*
