@@ -100,19 +100,9 @@ trainer = Trainer(
 trainer.train()
 
 
-# evaluate model on dev set
+# evaluate model on train and dev set
+train_results = trainer.evaluate(train_dataset)
 dev_results = trainer.evaluate()
-
-# evaluate model on train set
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset,
-    eval_dataset=train_dataset,
-    compute_metrics=compute_metrics
-)
-
-train_results = trainer.evaluate()
 
 # save down results
 with open(experiment_dir + "/results.json", "w") as f:
