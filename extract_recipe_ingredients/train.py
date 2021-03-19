@@ -133,7 +133,8 @@ with open(experiment_dir + "/params.json", "w") as f:
             "EPOCHS": EPOCHS,
             "TRAIN_SIZE": TRAIN_SIZE,
             "SHUFFLE_BUFFER_SIZE": SHUFFLE_BUFFER_SIZE,
-            "PRETRAINED_EMBEDDINGS": PRETRAINED_EMBEDDINGS
+            "PRETRAINED_EMBEDDINGS": PRETRAINED_EMBEDDINGS,
+            "USE_PRETRAINED_EMBEDDING_VOCAB": USE_PRETRAINED_EMBEDDING_VOCAB
         },
         f,
         indent=4)
