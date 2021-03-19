@@ -1,0 +1,6 @@
+{
+    "MODEL_NAME": "bert-base-cased",
+    "DATASET": "proprietary",
+    "EPOCHS": 40,
+    "BATCH_SIZE": 128
+}
