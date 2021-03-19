@@ -6,3 +6,6 @@ __pycache__
 data/train_examples.json
 data/dev_examples.json
 data/test_examples.json
+
+# ignore certain train tensorboard logs (can be very large)
+experiments/*/epoch_logs/train/events.out.tfevents.*.v2
