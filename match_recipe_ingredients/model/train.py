@@ -13,7 +13,7 @@ from evaluate import evaluate
 # hyperparameters
 # model structure
 WORD_EMBEDDING_SIZE = 100
-PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
+PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc_cased'
 USE_PRETRAINED_EMBEDDING_VOCAB = True
 SENTENCE_EMBEDDING_SIZE = 128
 EMBEDDING_ARCHITECTURE = 'bidirectional'

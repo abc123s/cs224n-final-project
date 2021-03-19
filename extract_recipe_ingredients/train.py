@@ -31,7 +31,7 @@ preprocessors = {
 }
 
 PREPROCESSOR = 'simple'
-PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc'
+PRETRAINED_EMBEDDINGS = 'ing_only_ing_doc_cased'
 USE_PRETRAINED_EMBEDDING_VOCAB = True
 EMBEDDING_UNITS = 100
 preprocess = preprocessors[PREPROCESSOR]
