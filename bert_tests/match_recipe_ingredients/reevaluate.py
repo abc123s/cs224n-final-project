@@ -1,28 +1,16 @@
 # script to reevaluate bert model performance in a way that is
 # comparable to the lstm model
-import json
-
 import transformers
-from transformers import BertForSequenceClassification, TrainingArguments, Trainer
+from transformers import BertTokenizerFast, BertForSequenceClassification, TrainingArguments, Trainer
 
 from preprocess import preprocess
 
 # transformers.logging.set_verbosity_info()
 
-experiment_dir = "experiments/20210318_0100_c997fdd"
+experiment_dir = "experiments/20210319_0022_714c500"
 
-# load experiment params
-with open(experiment_dir + "/params.json", "r") as f:
-    params = json.load(f)
-
-# preprocess data
-train_dataset, dev_dataset, tokenizer, num_labels = preprocess(
-    params["MODEL_NAME"],
-    params["DATASET"],
-)
-
-# make model
-model = BertForSequenceClassification.from_pretrained(params["MODEL_NAME"], num_labels=num_labels)
+tokenizer = BertTokenizerFast.from_pretrained(experiment_dir)
+model = BertForSequenceClassification.from_pretrained(experiment_dir)
 
 # make custom metric to track tag-level and sentence-level accuracy
 def compute_metrics(pred):
@@ -44,8 +32,8 @@ def compute_metrics(pred):
 # build model
 training_args = TrainingArguments(
     output_dir= experiment_dir + '/results',
-    num_train_epochs=params["EPOCHS"],
-    per_device_train_batch_size=params["BATCH_SIZE"],
+    num_train_epochs=0,
+    per_device_train_batch_size=128,
     per_device_eval_batch_size=64,
     warmup_steps=500,
     weight_decay=0.01,
