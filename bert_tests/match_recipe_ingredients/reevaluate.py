@@ -3,7 +3,7 @@
 import json
 
 import transformers
-from transformers import BertTokenizerFast, BertForTokenClassification, TrainingArguments, Trainer
+from transformers import BertForSequenceClassification, TrainingArguments, Trainer
 
 from preprocess import preprocess
 
