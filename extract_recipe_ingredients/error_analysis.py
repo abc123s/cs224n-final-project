@@ -67,15 +67,15 @@ if params.get("ORIGINAL_EXPERIMENT_DIR", None):
     _, dev_data, _, _, tokenized_dev_examples, word_encoder, tag_encoder = preprocess_manual(
         "./data", 
         original_examples,
-        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
-        embedding_size = params["EMBEDDING_UNITS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+        pretrained_embeddings = params.get("PRETRAINED_EMBEDDINGS") if params.get("USE_PRETRAINED_EMBEDDING_VOCAB") else None,
+        embedding_size = params.get("EMBEDDING_UNITS") if params.get("USE_PRETRAINED_EMBEDDING_VOCAB") else None
     )
 else:
     preprocess = preprocessors[params.get("PREPROCESSOR", 'original')]
     _, dev_data, _, _, _, word_encoder, tag_encoder = preprocess(
         "./data",
-        pretrained_embeddings = params["PRETRAINED_EMBEDDINGS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None,
-        embedding_size = params["EMBEDDING_UNITS"] if params["USE_PRETRAINED_EMBEDDING_VOCAB"] else None
+        pretrained_embeddings = params.get("PRETRAINED_EMBEDDINGS") if params.get("USE_PRETRAINED_EMBEDDING_VOCAB") else None,
+        embedding_size = params.get("EMBEDDING_UNITS") if params.get("USE_PRETRAINED_EMBEDDING_VOCAB") else None
     )
 
 # build and compile model based on experiment params:
@@ -103,6 +103,7 @@ model.load_weights(experiment_dir + "/model_weights")
 dev_batches = dev_data.padded_batch(128, padded_shapes=([None], [None]))
 
 # grab sample errors and compute confusion matrix
+correct_sentences = []
 incorrect_sentences = []
 all_predictions = []
 all_labels = []
@@ -151,11 +152,30 @@ for sentences, labels in dev_batches:
                 decoded_prediction,
                 decoded_answer,
             ))
+        else:
+            correct_sentences.append((
+                tokenized_dev_examples[dev_example_index],
+                decoded_sentence,
+                decoded_prediction,
+                decoded_answer,
+            ))
         
         dev_example_index += 1
 
 # randomly sample sentence errors and write to csv for error analysis
+sample_correct = random.choices(correct_sentences, k=100)
 sample_errors = random.choices(incorrect_sentences, k=100)
+
+with open(experiment_dir + '/correct_examples.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+
+    for original_sentence, decoded_sentence, prediction, answer in sample_correct:
+        writer.writerow(original_sentence)
+        writer.writerow(decoded_sentence)
+        writer.writerow(prediction)
+        writer.writerow(answer)
+        writer.writerow([])
+        writer.writerow([])
 
 with open(experiment_dir + '/error_analysis.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
