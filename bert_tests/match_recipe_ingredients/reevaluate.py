@@ -1,5 +1,7 @@
 # script to reevaluate bert model performance in a way that is
 # comparable to the lstm model
+import json
+
 import transformers
 from transformers import BertTokenizerFast, BertForSequenceClassification, TrainingArguments, Trainer
 
@@ -8,6 +10,16 @@ from preprocess import preprocess
 # transformers.logging.set_verbosity_info()
 
 experiment_dir = "experiments/20210319_0022_714c500"
+
+# load experiment params
+with open(experiment_dir + "/params.json", "r") as f:
+    params = json.load(f)
+
+# preprocess data
+train_dataset, dev_dataset, _, _ = preprocess(
+    experiment_dir,
+    params["DATASET"],
+)
 
 tokenizer = BertTokenizerFast.from_pretrained(experiment_dir)
 model = BertForSequenceClassification.from_pretrained(experiment_dir)
