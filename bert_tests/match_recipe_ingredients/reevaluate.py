@@ -1,5 +1,6 @@
 # script to reevaluate bert model performance in a way that is
 # comparable to the lstm model
+import json
 
 import transformers
 from transformers import BertTokenizerFast, BertForTokenClassification, TrainingArguments, Trainer
