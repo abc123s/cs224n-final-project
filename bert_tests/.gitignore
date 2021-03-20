@@ -3,3 +3,5 @@ __pycache__
 vocab.txt
 pytorch_model.bin
 checkpoint*
+
+ing_ins_rec_doc_cased.txt
