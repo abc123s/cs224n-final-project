@@ -1,0 +1,6 @@
+{
+    "MODEL_NAME": "../domain_specific_pretraining/experiments/20210319_1124_0113617",
+    "DATASET": "proprietary",
+    "EPOCHS": 40,
+    "BATCH_SIZE": 128
+}
