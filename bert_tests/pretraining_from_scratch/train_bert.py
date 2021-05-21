@@ -79,7 +79,7 @@ tokenizer.train(
 tokenizer.save_model(experiment_dir)
 
 # reload tokenizer in the transformers library
-tokenizer = BertTokenizerFast.from_pretrained(experiment_dir, )
+tokenizer = BertTokenizerFast.from_pretrained(experiment_dir)
 
 # prepare for MLM training
 config = BertConfig(
@@ -105,7 +105,6 @@ if params["LINE_BY_LINE"] and len(params["CORPUSES"]):
         file_path=params["CORPUSES"][0],
         block_size=params["MAX_POSITION_EMBEDDINGS"],
     )
-
 else:
     raise NotImplementedError
 
@@ -122,7 +121,7 @@ training_args = TrainingArguments(
     output_dir=experiment_dir,
     num_train_epochs=params["EPOCHS"],
     per_gpu_train_batch_size=params["BATCH_SIZE"],
-    save_steps=10_000,
+    save_steps=10000,
     save_total_limit=5,
 )
 
@@ -133,6 +132,8 @@ trainer = Trainer(
     data_collator=data_collator,
     train_dataset=dataset,
 )
+
+trainer.train()
 
 # save model
 trainer.save_model(experiment_dir)
