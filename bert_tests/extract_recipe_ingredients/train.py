@@ -15,13 +15,13 @@ from preprocess import preprocess
 
 params = {
     # model information
-    "MODEL_NAME": "bert-base-cased",
+    "MODEL_NAME": "../domain_specific_pretraining/experiments/20210518_0449_1659fe0",
     
     # training data
-    "DATASET": "proprietary",
+    "DATASET": "proprietary_2021_05_23",
 
     # training
-    "EPOCHS": 3,
+    "EPOCHS": 40,
     "BATCH_SIZE": 128,
 }
 
