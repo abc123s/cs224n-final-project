@@ -39,14 +39,14 @@ params = {
 
     # training data
     "CORPUSES": [
-        '../corpuses/ing_ins_rec_doc_cased_tiny.txt',
+        '../corpuses/ing_ins_rec_doc_cased_small.txt',
     ],
     "LINE_BY_LINE": True,
     "MLM_PROBABILITY": 0.15, # default for bert is 0.15
 
     # training
-    "EPOCHS": 3,
-    "BATCH_SIZE": 16,
+    "EPOCHS": 1,
+    "BATCH_SIZE": 8,
 }
 
 # make experiment directory and save experiment params down

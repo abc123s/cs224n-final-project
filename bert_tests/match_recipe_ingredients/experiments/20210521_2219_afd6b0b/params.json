@@ -1,0 +1,6 @@
+{
+    "MODEL_NAME": "../pretraining_from_scratch/experiments/20210521_0844_afd6b0b",
+    "DATASET": "proprietary",
+    "EPOCHS": 40,
+    "BATCH_SIZE": 16
+}
