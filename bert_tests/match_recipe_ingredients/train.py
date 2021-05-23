@@ -75,7 +75,8 @@ training_args = TrainingArguments(
     weight_decay=0.01,
     logging_dir=experiment_dir + '/logs',           
     logging_strategy="epoch",
-    evaluation_strategy="epoch"
+    evaluation_strategy="epoch",
+    save_total_limit=2,
 )
 
 trainer = Trainer(
